@@ -1,3 +1,6 @@
-Data/*
+data/*
 .conda/*
 __pycache__/*
+cache/*
+.deepeval_telemetry.txt
+.deepeval-cache.json

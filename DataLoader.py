@@ -59,4 +59,4 @@ class DataLoader:
         return documents
         
 if __name__ == "__main__":
-    print(len(DataLoader.load_arxiv_papers('Data/arxiv-metadata-oai-snapshot.json', 100)))
+    print(len(DataLoader.load_arxiv_papers('data/arxiv-metadata-oai-snapshot.json', 100)))
