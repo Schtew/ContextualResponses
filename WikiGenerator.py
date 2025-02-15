@@ -68,7 +68,7 @@ class WikiGenerator:
         print(f"Data saved to {filename}")
 
 if __name__ == "__main__":
-    dataGenerator = DataGenerator()
+    dataGenerator = WikiGenerator()
     
     category_name = "Category:Computer_science"
     cat = dataGenerator.wiki_wiki.page(category_name)
