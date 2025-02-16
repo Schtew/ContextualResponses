@@ -10,3 +10,4 @@ TODO:
 - Implement DeepEval for testing generated responses.
     - Find/create a list of expected outputs for eval purposes.
 - Consider various prompts.
+- Add React front end
