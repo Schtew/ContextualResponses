@@ -7,6 +7,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
 class SearchEngine:
+    #For Flask implementation, utilize generate response to sort between perfered sources, not init. 1 init per page reload for now (should be account/instance in theory)
     def __init__(self, arXiv = 1000, wiki = 1000):
         """
         Initialize the SearchEngine with an optional number of arXiv papers to load.
@@ -23,7 +24,7 @@ class SearchEngine:
         if arXiv:
             self.documents = DataLoader.load_arxiv_papers('data/arxiv-metadata-oai-snapshot.json', arXiv)
         if wiki:
-            self.documents += DataLoader.load_wikipedia_pages('data/computer_science_pages.json', wiki)
+            self.documents += DataLoader.load_wikipedia_pages('data/computer_science_pages_cleaned.json', wiki)
         # print(self.documents[0])
         # self.vectorstore = FAISS.from_documents(documents=self.documents, embedding=cached_embedding)
         

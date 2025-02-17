@@ -52,7 +52,7 @@ class Evaluate:
         '''
         print(f"Estimating cost for {len(documents)} documents")
         enc = tiktoken.encoding_for_model(model)
-        total_tokens = sum(len(enc.encode(doc.page_content)) for doc in documents)
+        total_tokens = sum(len(enc.encode(doc.page_content, disallowed_special=())) for doc in documents)
         cost = (total_tokens / 1000000) * .02
         print(f"Estimated cost: ${cost:.2f} for {total_tokens} tokens")
         

@@ -71,7 +71,7 @@ class DataLoader:
             List of document objects
         """
         try:
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r', encoding='utf-8') as file:
                 data = json.loads(file.read())
                 limited_data = data[:num_pages] if num_pages < len(data) else data
                 documents = []
@@ -88,7 +88,7 @@ class DataLoader:
                 print(f"Successfully loaded {len(documents)} pages")
                 return documents
         except Exception as e:
-            print("Error while loading wikipedia pages: {e}")
+            print(f"Error while loading wikipedia pages: {e}")
             
     
     def check_wikipedia(path = 'data/computer_science_pages.json'):
@@ -100,7 +100,7 @@ class DataLoader:
         none_count = 0
         invalid_entries = 0
         try:
-            with open(path, 'r') as file:
+            with open(path, 'r', encoding='utf-8') as file:
                 data = json.loads(file.read())
                 print(f"Checking {len(data)} items")
                 
@@ -140,7 +140,7 @@ class DataLoader:
         ''' Remove invalid entries from the wikipedia pages file'''
         output_path = input_path[:-5] + '_cleaned' + ".json"
         try:
-            with open(input_path, 'r') as file:
+            with open(input_path, 'r', encoding='utf-8') as file:
                 data = json.loads(file.read())
             original_count = len(data)
             cleaned_data = [item for item in data if item != None 
@@ -150,7 +150,7 @@ class DataLoader:
             ]
 
             with open(output_path, 'w', encoding='utf-8') as file:
-                json.dump(cleaned_data, file, ensure_ascii=False, indent=None, separators=(',', ':'))
+                json.dump(cleaned_data, file, ensure_ascii=False, indent=2)
             
             print(f'Original entries: {original_count}')
             print(f'Cleaned entries: {len(cleaned_data)}')
@@ -170,5 +170,6 @@ class DataLoader:
 if __name__ == "__main__":
     # print(len(DataLoader.load_arxiv_papers('data/arxiv-metadata-oai-snapshot.json', 100)))
     # print(len(DataLoader.load_wikipedia_pages('data/computer_science_pages.json', 1000)))
-    DataLoader.clean_wikipedia('data/computer_science_pages.json')
+    # DataLoader.clean_wikipedia('data/computer_science_pages.json')
+    DataLoader.check_wikipedia('data/computer_science_pages_cleaned.json')
     
