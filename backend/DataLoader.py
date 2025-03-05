@@ -2,10 +2,11 @@ import pandas as pd
 import json
 import datetime
 from langchain_core.documents import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 import re
 
 class DataLoader:
-    def load_arxiv_papers(file_path: str, num_papers: int = 1000):
+    def load_arxiv_papers(file_path: str, num_papers: float = float('inf')):
         """
         Load arXiv papers from: https://www.kaggle.com/datasets/Cornell-University/arxiv
         Filters for papers with computer science ('cs') in the categories.
@@ -24,16 +25,11 @@ class DataLoader:
             for line in f:
                 try:
                     paper = json.loads(line)
-                    
                     if not paper.get('categories', '').startswith('cs'):
                         continue
-                    # Calculate a random age for the paper (for demo purposes)
-                    # days_old = random.randint(1, 365)
-                    
                     # Clean and combine abstract/title
                     content = f"Title: {paper.get('title', '')}\nAbstract: {paper.get('abstract', '')}"
                     content = content.replace('\n', ' ').strip()
-                    
                     doc = Document(
                         page_content=content,
                         metadata={
@@ -46,22 +42,23 @@ class DataLoader:
                         }
                     )
                     documents.append(doc)
-                    
                     papers_processed += 1
                     if papers_processed >= num_papers:
                         break
-                    
                 except json.JSONDecodeError as e:
                     print(f"Error parsing JSON: {e}")
                     continue
-                    
-        print(f"Successfully loaded {len(documents)} papers")
+        print(f"Successfully loaded {len(documents)} abstracts")
         return documents
         
-    def load_wikipedia_pages(file_path: str, num_pages: int = 1000):
+    def load_wikipedia_pages(
+        file_path: str, 
+        num_pages:  float = float('inf'),
+        chunk_size: int = 1000,
+        chunk_overlap: int = 200,
+        separators = None):
         """
         Load wikipedia pages from gathered from WikiGenerator.py
-        Filters for pages that are a subcategory of 'Computer Science'.
         
         Args:
             file_path: Path to the wikipedia json file
@@ -71,21 +68,29 @@ class DataLoader:
             List of document objects
         """
         try:
+            text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            separators=separators or ['\n\n', '\n', '. ', ' ', ''],
+            length_function=len
+            )
             with open(file_path, 'r', encoding='utf-8') as file:
                 data = json.loads(file.read())
                 limited_data = data[:num_pages] if num_pages < len(data) else data
                 documents = []
                 for item in limited_data:
-                    doc = Document(
-                        page_content=item['content'],
-                        metadata={
-                            'type': 'wikipedia_page',
-                            'title': item['title'],
-                            'categories': item['categories']
-                        }
+                    metadata = {
+                        'type': 'wikipedia_page',
+                        'title': item['title'],
+                        'categories': item['categories']
+                    }
+                    chunks = text_splitter.create_documents(
+                        texts=[item['content']],
+                        metadatas=[metadata]
                     )
-                    documents.append(doc)
-                print(f"Successfully loaded {len(documents)} pages")
+                    for chunk in chunks:
+                        documents.append(chunk)
+                print(f"Successfully loaded {len(documents)} chunks from {len(limited_data)} pages")
                 return documents
         except Exception as e:
             print(f"Error while loading wikipedia pages: {e}")
@@ -103,19 +108,16 @@ class DataLoader:
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.loads(file.read())
                 print(f"Checking {len(data)} items")
-                
                 for i, item in enumerate(data, 1):  # start counting at 1
                     if item is None:
                         none_count += 1
                         print(f"Entry {i} is None")
                         continue
-                        
                     try:
                         missing_fields = [
                             key for key in ['title', 'content', 'categories'] 
                             if not item.get(key)
                         ]
-                        
                         if missing_fields:
                             invalid_entries += 1
                             print(f"Entry {i} is missing fields: {missing_fields}")
@@ -124,14 +126,12 @@ class DataLoader:
                         invalid_entries += 1
                         print(f"Entry {i} is invalid type: {type(item)}")
                         print(f"Entry content: {item}")
-                        
             # Print summary
             print("\nSummary:")
             print(f"Total entries: {len(data)}")
             print(f"None entries: {none_count}")
             print(f"Invalid entries: {invalid_entries}")
             print(f"Valid entries: {len(data) - none_count - invalid_entries}")
-                        
         except Exception as e:
             print(f"Error occurred at entry {i}: {str(e)}")
             raise
@@ -148,10 +148,8 @@ class DataLoader:
                             and all(isinstance(item.get(key), str) for key in ['title', 'content'])
                             and isinstance(item.get('categories'), list)
             ]
-
             with open(output_path, 'w', encoding='utf-8') as file:
                 json.dump(cleaned_data, file, ensure_ascii=False, indent=2)
-            
             print(f'Original entries: {original_count}')
             print(f'Cleaned entries: {len(cleaned_data)}')
             print(f'Cleaned entries: {original_count - len(cleaned_data)}')

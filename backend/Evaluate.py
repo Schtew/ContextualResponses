@@ -1,4 +1,3 @@
-from SearchEngine import SearchEngine
 from deepeval import assert_test
 from deepeval.metrics import (
     AnswerRelevancyMetric, 
@@ -42,7 +41,7 @@ class Evaluate:
         evaluate([test_case], metrics)
         # return results
     
-    def estimate_cost(documents, model = 'text-embedding-3-small'):
+    def estimate_cost(self, documents, model = 'text-embedding-3-small'):
         ''' 
         Estimate the cost of generating embeddings for a list of documents
         
@@ -55,8 +54,5 @@ class Evaluate:
         total_tokens = sum(len(enc.encode(doc.page_content, disallowed_special=())) for doc in documents)
         cost = (total_tokens / 1000000) * .02
         print(f"Estimated cost: ${cost:.2f} for {total_tokens} tokens")
-        
-if __name__ == "__main__":
-    engine = SearchEngine(float('inf'), float('inf'))
-    Evaluate.estimate_cost(engine.documents)
+
     

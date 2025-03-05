@@ -3,11 +3,14 @@ Proof of Concept RAG model which references documents from various sources and t
 ArXiv-10 database: https://www.kaggle.com/datasets/Cornell-University/arxiv
 
 TODO:
-- Implement StackOverflow db and wikipedia db
-    - Implement cleaning for StackOverflow and chunking for Wikipedia.
-- Rerank results retrieved by similarity with metadata.
-    - Implement corresponding retreival evaluations.
-- Implement DeepEval for testing generated responses.
-    - Find/create a list of expected outputs for eval purposes.
-- Consider various prompts.
-- Add React front end
+- Rerank results retrieved by similarity with metadata. Wiki results overweighed at the moment.
+- Find/create a list of expected outputs for eval purposes. 
+- Consider various prompts. 
+- Implement Flask for backend.
+
+Completed:
+- Implement Wikipedia db ✅
+    - Implement chunking for Wikipedia. ✅
+- Implement DeepEval for testing generated responses. ✅
+- Add React front end. ✅
+- Implement local vector storage for faster retrieval and cost savings. ✅
